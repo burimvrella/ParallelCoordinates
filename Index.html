@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://d3js.org/d3.v7.js"></script>
+  <link rel="shortcut icon" href="#">
+  <link rel="stylesheet" href="styles.css">
+  <title>Parallel Coordinates</title>
+</head>
+<body>
+
+<div><h1>Parallel Coordinates</h1></div>
+
+<form id="uploadFile">
+  <input id="file" name="file" type="file" />
+  <input class="button" id="submit" type="submit" value="Submit" />
+  <button class="button" id="delete" type="button" value=""> Delete </button>
+</form>
+
+<div id="selectfeaturs">
+  <button class="button" id="choosenfeatures" type="button"> Features </button>
+</div>
+<span id="error"></span>
+
+<div class="student">
+  <div id="name">Hovered Student:</div>
+  <div id="selectedstudent"> </div>
+</div>
+
+<div>
+  <button onclick="save_as_svg()">click</button>
+</div>
+
+<div id="parallelcoords"></div>
+<!--
+  <script src="paracoords.js"></script>
+-->
+<script src="parallelcoordinates.js" > </script>
+
+</body>
+
+</html>
