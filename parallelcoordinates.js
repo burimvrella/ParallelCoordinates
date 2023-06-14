@@ -138,15 +138,14 @@ function GenarateSVG(data, newfeatures){
 
 
       //TODO fix this 
-      const brusheventHandler = function(features){
-        console.log(features)
-        if(features.sourceEvent && features.sourceEvent.type === 'zoom')
+      const brusheventHandler = function(event,features){
+        if(event.sourceEvent && event.sourceEvent.type === 'zoom')
+        return;
+        if(features === 'Name'){
           return;
-          if(features === 'Name'){
-            return;
-          }
-        if(d3.selection != null){
-          filters[features] = d3.selection.map(d => yScales[features].invert(d))
+        }
+        if(event.selection != null){
+          filters[features] = event.selection.map(d => yScales[features].invert(d))
         } else{
           if(features in filters)
             delete(filters[features])
@@ -168,13 +167,13 @@ function GenarateSVG(data, newfeatures){
       }
 
       const yBrushes = {};
-      var brush = Object.entries(yScales).map(x =>{
+      Object.entries(yScales).map(x =>{
         let extent = [[-(brush_width/2), padding-1],
         [brush_width/2, height-padding]]
         yBrushes[x[0]] = d3.brushY()
           .extent(extent)
-          .on('brush', () => brusheventHandler(x[0]))
-          .on('end', () => brusheventHandler(x[0]))
+          .on('brush', (event) => brusheventHandler(event,x[0]))
+          .on('end', (event) => brusheventHandler(event,x[0]))
       })
       var lineGenerator = d3.line()
     
@@ -192,7 +191,7 @@ function GenarateSVG(data, newfeatures){
       }
 
       var highlight = function(d){
-        selected_student = d.Name
+        selected_student = d.target.__data__.Name
         selectedstudent.innerHTML = selected_student;
 
         // Second the hovered specie takes its color
@@ -258,8 +257,9 @@ function GenarateSVG(data, newfeatures){
             .attr('transform', d =>('translate('+ xScales(d.name) +')'))
             .call(d3.drag()
               .on("start", function(d){
-                dragging[(d.subject).name] = this.__origin__ = xScales((d.subject).name)
-               inactive.attr("visibility", "hidden")
+                this.__origin__ = xScales((d.subject).name)
+                dragging[(d.subject).name] = this.__origin__ 
+                inactive.attr("visibility", "hidden")
               })        
               .on("drag",function(d) {
                 dragging[(d.subject).name] = Math.min(width, Math.max(0, this.__origin__ += d.dx));
@@ -275,7 +275,7 @@ function GenarateSVG(data, newfeatures){
                 transition(active).attr('d', linePath)
                 inactive.attr('d', linePath)
                   .transition()
-                  .delay(20)
+                  .delay(5)
                   .duration(0)
                   .attr("visibility", null)
               }));
@@ -300,6 +300,5 @@ function GenarateSVG(data, newfeatures){
           .attr("text-anchor", "middle")
           .attr('y', padding/2)
           .text(d=>d.name);
-
 }
 

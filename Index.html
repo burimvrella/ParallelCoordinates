@@ -14,13 +14,14 @@
 <div><h1>Parallel Coordinates</h1></div>
 
 <form id="uploadFile">
-  <input id="file" name="file" type="file" />
-  <input class="button" id="submit" type="submit" value="Submit" />
+  <label for="file" class="button">Select File</label>
+  <input id="file" name="file" type="file" style="display: none;" />
+  <input class="button" id="submit" type="submit" value="Open"/>
   <button class="button" id="delete" type="button" value=""> Delete </button>
 </form>
 
 <div id="selectfeaturs">
-  <button class="button" id="choosenfeatures" type="button"> Features </button>
+  <button class="button" id="choosenfeatures" type="button"> Dimensions </button>
 </div>
 <span id="error"></span>
 
