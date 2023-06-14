@@ -78,12 +78,12 @@ function SelectFeatures(data){
             newfeatures.push(selectedfeature.value);
           });
           choosenfeatures.disabled = true;
-          GenarateSVG(data,newfeatures);
+          GenerateSVG(data,newfeatures);
         }
     });
 } 
 
-function GenarateSVG(data, newfeatures){
+function GenerateSVG(data, newfeatures){
 
   var features = [];
   var newdataset = [];
@@ -111,33 +111,18 @@ function GenarateSVG(data, newfeatures){
           .range([padding,height-padding])
         }
         else{
-          if(x.name === "Maths")
-          {
-            yScales[x.name] = d3.scaleLinear()
-            //hier to invert
-            .domain([0,100])
-            .range([padding,height-padding])
-          }
-          else{
-            yScales[x.name] = d3.scaleLinear()
-            //hier to invert
-            .domain([0,100])
-            .range([height-padding,padding])
-          }
+          yScales[x.name] = d3.scaleLinear()
+          .domain([0,100])
+          .range([height-padding,padding])
         }
       })
       
       var yAxis = {};
-      var yaxis = Object.entries(yScales).map(x => {
-        if(x[0] === "Name"){
-          yAxis[x[0]] = d3.axisRight(x[1])
-        }else{
-          yAxis[x[0]] = d3.axisLeft(x[1])
-        }  
+      Object.entries(yScales).map(x => {
+          yAxis[x[0]] = d3.axisLeft(x[1]) 
       })
 
 
-      //TODO fix this 
       const brusheventHandler = function(event,features){
         if(event.sourceEvent && event.sourceEvent.type === 'zoom')
         return;
@@ -145,7 +130,7 @@ function GenarateSVG(data, newfeatures){
           return;
         }
         if(event.selection != null){
-          filters[features] = event.selection.map(d => yScales[features].invert(d))
+          filters[features] = event.selection.map(() => yScales[features])
         } else{
           if(features in filters)
             delete(filters[features])
@@ -299,6 +284,13 @@ function GenarateSVG(data, newfeatures){
           .append("text")
           .attr("text-anchor", "middle")
           .attr('y', padding/2)
-          .text(d=>d.name);
+          .text(d=>d.name)
+          .on("click", invert);
+
+          function invert(event,d) {
+              yScales[d.name] = d3.scaleLinear()
+                .domain(yScales[d.name].domain().reverse())
+                .range([padding,height-padding]);
+          }
 }
 
