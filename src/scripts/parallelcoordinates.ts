@@ -1,4 +1,11 @@
 class SteerableParacoords {
+  private data: any;
+  private newfeatures: any;
+  private width: number;
+  private height: number;
+  private padding: number;
+  private brush_width: number;
+  private filters: {};
   constructor(data, newfeatures) {
     this.data = data;
     this.newfeatures = newfeatures;
