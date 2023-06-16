@@ -37,7 +37,7 @@ $(document).ready(function () {
       newfeatures = []
       var get= document.getElementsByName('features');
       for(var i= 0; i < get.length; i++){
-        get[i].checked= false;
+        get[i].checked = false;
       }  
       choosenfeatures.disabled = false;
     });
@@ -55,6 +55,7 @@ $(document).ready(function () {
           checkbox.type = "checkbox";
           checkbox.name =  "features";
           checkbox.value = feature.feature;
+          checkbox.checked = true;
           checkbox.id = feature.feature;
     
           var label = document.createElement('label');
