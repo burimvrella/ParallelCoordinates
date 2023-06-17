@@ -1,11 +1,14 @@
+import * as d3 from 'd3';
+
 class SteerableParacoords {
   private data: any;
   private newfeatures: any;
-  private width: number;
+  width: number;
   private height: number;
   private padding: number;
   private brush_width: number;
   private filters: {};
+
   constructor(data, newfeatures) {
     this.data = data;
     this.newfeatures = newfeatures;
@@ -108,7 +111,7 @@ class SteerableParacoords {
     })
 
 
-    const brusheventHandler = function (event, features) {
+    /*const brusheventHandler = function (event, features) {
       if (event.sourceEvent && event.sourceEvent.type === 'zoom')
         return;
       if (features === 'Name') {
@@ -144,7 +147,7 @@ class SteerableParacoords {
         .extent(extent)
         .on('brush', (event) => brusheventHandler(event, x[0]))
         .on('end', (event) => brusheventHandler(event, x[0]))
-    })
+    })*/
 
     function linePath(d) {
       var lineGenerator = d3.line()
@@ -160,7 +163,7 @@ class SteerableParacoords {
       return (lineGenerator(points))
     }
 
-    var highlight = function (d) {
+    /*var highlight = function (d) {
       selected_student = d.target.__data__.Name
       selectedstudent.innerHTML = selected_student;
 
@@ -170,7 +173,7 @@ class SteerableParacoords {
         .style("stroke", selected_student)
         .style("opacity", "5")
         .style('stroke', 'red')
-      //.style({'stroke': 'red', 'fill': 'none', 'stroke-width': '1px'}) 
+      //.style({'stroke': 'red', 'fill': 'none', 'stroke-width': '1px'})
     }
 
     // Unhighlight
@@ -180,7 +183,7 @@ class SteerableParacoords {
         .style("stroke", selected_student)
         .style("opacity", ".4")
         .style('stroke', '#0081af')
-    }
+    }*/
 
     var dragging = {},
       active,
@@ -217,28 +220,29 @@ class SteerableParacoords {
       .attr("class", function (d) { return "line " + d.Name })
       .attr('d', linePath.bind(this))
       .style("opacity", 0.5)
-      .on("mouseover", highlight)
-      .on("mouseleave", doNotHighlight)
+      //.on("mouseover", highlight)
+      //.on("mouseleave", doNotHighlight)
 
 
 
     const featureAxisG = svg.selectAll('g.feature')
       .data(features)
-      .enter()
+      //.enter()
       .append('g')
       .attr('class', 'feature')
       .attr('transform', d => ('translate(' + xScales(d.name) + ')'))
       .call(d3.drag()
+          /*
         .on("start", function (d) {
           this.__origin__ = xScales((d.subject).name)
           dragging[(d.subject).name] = this.__origin__
           inactive.attr("visibility", "hidden")
         })
         .on("drag", function (d) {
-          dragging[(d.subject).name] = Math.min(width, Math.max(0, this.__origin__ += d.dx));
+          dragging[(d.subject).name] = Math.min(this.width, Math.max(0, this.__origin__ += d.dx));
           active.attr('d', linePath);
-          newfeatures.sort(function (a, b) { return position(b) - position(a); });
-          xScales.domain(newfeatures);
+          this["newfeatures"].sort(function (a, b) { return position(b) - position(a); });
+          xScales.domain(this["newfeatures"]);
           featureAxisG.attr("transform", function (d) { return "translate(" + position(d.name) + ")"; })
         })
         .on("end", function (d) {
@@ -251,7 +255,7 @@ class SteerableParacoords {
             .delay(5)
             .duration(0)
             .attr("visibility", null)
-        }));
+        })*/);
 
     featureAxisG
       .append('g')
@@ -265,7 +269,7 @@ class SteerableParacoords {
         d3.select(this)
           .append('g')
           .attr('class', 'brush')
-          .call(yBrushes[d.name]);
+          //.call(yBrushes[d.name]);
       });
 
     featureAxisG

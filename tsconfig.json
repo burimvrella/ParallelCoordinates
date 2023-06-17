@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es5",
+    "target": "es2022",
     "sourceMap": false,
     "outDir": "lib",
-    "pretty": true
+    "pretty": true,
+    "downlevelIteration" : true
   },
   "include": [
     "src/**/*"
