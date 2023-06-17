@@ -227,35 +227,38 @@ class SteerableParacoords {
 
     const featureAxisG = svg.selectAll('g.feature')
       .data(features)
-      //.enter()
+      .enter()
       .append('g')
       .attr('class', 'feature')
       .attr('transform', d => ('translate(' + xScales(d.name) + ')'))
       .call(d3.drag()
-          /*
+
         .on("start", function (d) {
           this.__origin__ = xScales((d.subject).name)
           dragging[(d.subject).name] = this.__origin__
           inactive.attr("visibility", "hidden")
-        })
-        .on("drag", function (d) {
-          dragging[(d.subject).name] = Math.min(this.width, Math.max(0, this.__origin__ += d.dx));
-          active.attr('d', linePath);
-          this["newfeatures"].sort(function (a, b) { return position(b) - position(a); });
-          xScales.domain(this["newfeatures"]);
-          featureAxisG.attr("transform", function (d) { return "translate(" + position(d.name) + ")"; })
-        })
-        .on("end", function (d) {
-          delete this.__origin__;
-          delete dragging[(d.subject).name];
-          transition(d3.select(this)).attr('transform', d => ('translate(' + xScales(d.name) + ')'));
-          transition(active).attr('d', linePath)
-          inactive.attr('d', linePath)
-            .transition()
-            .delay(5)
-            .duration(0)
-            .attr("visibility", null)
-        })*/);
+          /*
+       })
+       .on("drag", function (d) {
+         dragging[(d.subject).name] = Math.min(this.width, Math.max(0, this.__origin__ += d.dx));
+         active.attr('d', linePath);
+         this["newfeatures"].sort(function (a, b) { return position(b) - position(a); });
+         xScales.domain(this["newfeatures"]);
+         featureAxisG.attr("transform", function (d) { return "translate(" + position(d.name) + ")"; })
+       })
+       .on("end", function (d) {
+         delete this.__origin__;
+         delete dragging[(d.subject).name];
+         transition(d3.select(this)).attr('transform', d => ('translate(' + xScales(d.name) + ')'));
+         transition(active).attr('d', linePath)
+         inactive.attr('d', linePath)
+           .transition()
+           .delay(5)
+           .duration(0)
+           .attr("visibility", null)
+
+           */
+       }));
 
     featureAxisG
       .append('g')
