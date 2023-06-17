@@ -101,10 +101,11 @@ function GenerateSVG(data, newfeatures){
   var xScales = d3.scalePoint()
       .range([width-padding,padding])
       .domain(features.map(x => x.name))
-    
+
   var yScales = {};
       features.map(x => {
-  
+        console.log(x.name)
+
         if(x.name === "Name") {
           yScales[x.name] = d3.scalePoint()
           .domain(newdataset.map(function(d) { return d.Name; })) 
@@ -130,7 +131,7 @@ function GenerateSVG(data, newfeatures){
           return;
         }
         if(event.selection != null){
-          filters[features] = event.selection.map(() => yScales[features])
+          filters[features] = event.selection.map(d => yScales[features].invert(d))
         } else{
           if(features in filters)
             delete(filters[features])
@@ -286,11 +287,14 @@ function GenerateSVG(data, newfeatures){
           .attr('y', padding/2)
           .text(d=>d.name)
           .on("click", invert);
-
+          
+          
           function invert(event,d) {
-              yScales[d.name] = d3.scaleLinear()
-                .domain(yScales[d.name].domain().reverse())
-                .range([padding,height-padding]);
+         
+          
+          d3.select(this.parentElement.childNodes[0])
+          .transition()
+          .call(yAxis[d.name].scale( yScales[d.name].domain(yScales[d.name].domain().reverse()).range([padding,height-padding])))
           }
 }
 
