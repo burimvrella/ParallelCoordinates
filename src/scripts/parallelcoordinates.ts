@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+declare const d3: any;
 
 class SteerableParacoords {
   private data: any;
