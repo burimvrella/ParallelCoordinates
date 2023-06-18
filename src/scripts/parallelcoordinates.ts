@@ -15,7 +15,7 @@ class SteerableParacoords {
   yScales: {};
   private active: any;
   private inactive: any;
-
+  private newdataset: any;
 
 
   constructor(data, newfeatures) {
@@ -33,11 +33,7 @@ class SteerableParacoords {
     this.yScales = {};
     this.active = null;
     this.inactive = null;
-  }
-
-  setupAxis()
-  {
-
+    this.newdataset = [];
   }
 
   // TODO implement
@@ -142,40 +138,43 @@ class SteerableParacoords {
     }
   }
 
-
-  // TODO refactor
-  GenerateSVG() {
-    // var features = [];
-    var newdataset = [];
-
+  prepareData()
+  {
     this.data.forEach(obj => {
       var newdata = {};
-      this.newfeatures.forEach(feature => {
-        newdata[feature] = obj[feature]
-      })
-      newdataset.push(newdata)
+      this.newfeatures.forEach(feature => { newdata[feature] = obj[feature] })
+      this.newdataset.push(newdata)
     })
 
-    var temp = Object.keys(newdataset[0])
-    temp.forEach(element => this.features.push({ 'name': element }))
+    Object.keys(this.newdataset[0]).forEach(element => this.features.push({ 'name': element }))
+  }
 
-    this.xScales = d3.scalePoint()
-      .range([this.width - this.padding, this.padding])
-      .domain(this.features.map(x => x.name))
-
+  setupScales()
+  {
     this.features.map(x => {
 
       if (x.name === "Name") {
         this.yScales[x.name] = d3.scalePoint()
-          .domain(newdataset.map(function (d) { return d.Name; }))
-          .range([this.padding, this.height - this.padding])
+            .domain(this.newdataset.map(function (d) { return d.Name; }))
+            .range([this.padding, this.height - this.padding])
       }
       else {
         this.yScales[x.name] = d3.scaleLinear()
-          .domain([0, 100])
-          .range([this.height - this.padding, this.padding])
+            .domain([0, 100])
+            .range([this.height - this.padding, this.padding])
       }
     })
+
+    this.xScales = d3.scalePoint()
+        .range([this.width - this.padding, this.padding])
+        .domain(this.features.map(x => x.name))
+  }
+
+
+  // TODO refactor
+  GenerateSVG() {
+    this.prepareData();
+    this.setupScales();
 
     var yAxis = {};
     Object.entries(this.yScales).map(x => {
@@ -221,101 +220,68 @@ class SteerableParacoords {
         .on('end', (event) => brusheventHandler(event, x[0]))
     })*/
 
-    var highlight = function (d) {
-      var selected_student = d.target.__data__.Name
-
-      const selectedStudentElement = document.getElementById("selectedstudent");
-      if (selectedStudentElement) {
-        selectedStudentElement.innerHTML = selected_student;
-      }
-
-      // Second the hovered specie takes its color
-      d3.selectAll("." + selected_student)
-        .transition().duration(5)
-        .style("stroke", selected_student)
-        .style("opacity", "5")
-        .style('stroke', 'red')
-    }
-
-    // Unhighlight
-    var doNotHighlight = function (d) {
-      var selected_student = d.target.__data__.Name
-      d3.selectAll("." + selected_student)
-        .transition().duration(5)
-        .style("stroke", selected_student)
-        .style("opacity", ".4")
-        .style('stroke', '#0081af')
-    }
-
-    function transition(g) {
-      return g.transition().duration(50);
-    }
-
-
     const svg = d3.select("#parallelcoords")
-      .append('svg')
-      .attr("viewBox", "0 0 1200 400")
+        .append('svg')
+        .attr("viewBox", "0 0 1200 400")
 
     this.inactive = svg.append('g')
-      .attr('class', 'inactive')
-      .selectAll('path')
-      .data(this.data)
-      .enter()
-      .append('path')
-      .attr('d', this.linePath.bind(this))
+        .attr('class', 'inactive')
+        .selectAll('path')
+        .data(this.data)
+        .enter()
+        .append('path')
+        .attr('d', this.linePath.bind(this))
 
     this.active = svg.append('g')
-      .attr('class', 'active')
-      .selectAll('path')
-      .data(this.data)
-      .enter()
-      .append('path')
-      .attr("class", function (d) { return "line " + d.Name })
-      .attr('d', this.linePath.bind(this))
-      .style("opacity", 0.5)
-      .on("mouseover", highlight)
-      .on("mouseleave", doNotHighlight)
-
-
+        .attr('class', 'active')
+        .selectAll('path')
+        .data(this.data)
+        .enter()
+        .append('path')
+        .attr("class", function (d) { return "line " + d.Name })
+        .attr('d', this.linePath.bind(this))
+        .style("opacity", 0.5)
+        .on("mouseover", this.highlight)
+        .on("mouseleave", this.doNotHighlight)
 
     this.featureAxisG = svg.selectAll('g.feature')
-      .data(this.features)
-      .enter()
-      .append('g')
-      .attr('class', 'feature')
-      .attr('transform', d => ('translate(' + this.xScales(d.name) + ')'))
-      .call(d3.drag()
-          .on("start", this.onDragStartEventHandler(this))
-          .on("drag", this.onDragEventHandler(this))
-          .on("end", this.onDragEndEventHandler(this))
-      );
+        .data(this.features)
+        .enter()
+        .append('g')
+        .attr('class', 'feature')
+        .attr('transform', d => ('translate(' + this.xScales(d.name) + ')'))
+        .call(d3.drag()
+            .on("start", this.onDragStartEventHandler(this))
+            .on("drag", this.onDragEventHandler(this))
+            .on("end", this.onDragEndEventHandler(this))
+        );
 
     this.featureAxisG
-      .append('g')
-      .each(function (d) {
-        d3.select(this)
-          .call(yAxis[d.name]);
-      });
+        .append('g')
+        .each(function (d) {
+          d3.select(this)
+              .call(yAxis[d.name]);
+        });
 
     this.featureAxisG
-      .each(function (d) {
-        d3.select(this)
-          .append('g')
-          .attr('class', 'brush')
+        .each(function (d) {
+          d3.select(this)
+              .append('g')
+              .attr('class', 'brush')
           //.call(yBrushes[d.name]);
-      });
+        });
 
     this.featureAxisG
-      .append("text")
-      .attr("text-anchor", "middle")
-      .attr('y', this.padding / 2)
-      .text(d => d.name)
-      .on("click", invert);
+        .append("text")
+        .attr("text-anchor", "middle")
+        .attr('y', this.padding / 2)
+        .text(d => d.name)
+        .on("click", invert);
 
     function invert(event, d) {
       this.yScales[d.name] = d3.scaleLinear()
-        .domain(this.yScales[d.name].domain().reverse())
-        .range([this.padding, this.height - this.padding]);
+          .domain(this.yScales[d.name].domain().reverse())
+          .range([this.padding, this.height - this.padding]);
     }
   }
 
@@ -332,7 +298,34 @@ class SteerableParacoords {
     })
     return (lineGenerator(points))
   }
-  
+
+
+  highlight(d) {
+    var selected_student = d.target.__data__.Name
+    const selectedStudentElement = document.getElementById("selectedstudent");
+    if (selectedStudentElement) {
+      selectedStudentElement.innerHTML = selected_student;
+    }
+
+    // Second the hovered specie takes its color
+    d3.selectAll("." + selected_student)
+        .transition().duration(5)
+        .style("stroke", selected_student)
+        .style("opacity", "5")
+        .style('stroke', 'red')
+  }
+
+  doNotHighlight (d) {
+    var selected_student = d.target.__data__.Name
+    d3.selectAll("." + selected_student)
+        .transition().duration(5)
+        .style("stroke", selected_student)
+        .style("opacity", ".4")
+        .style('stroke', '#0081af')
+  }
+
+
+
 }
 
 
