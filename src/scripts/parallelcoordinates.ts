@@ -12,6 +12,7 @@ class SteerableParacoords {
   xScales: any;
   dragging: any;
   private featureAxisG: any;
+  yScales: {};
 
 
 
@@ -27,6 +28,12 @@ class SteerableParacoords {
     this.xScales = null;
     this.dragging = {};
     this.featureAxisG = null;
+    this.yScales = {};
+  }
+
+  setupAxis()
+  {
+
   }
 
   // TODO implement
@@ -152,23 +159,22 @@ class SteerableParacoords {
       .range([this.width - this.padding, this.padding])
       .domain(this.features.map(x => x.name))
 
-    var yScales = {};
     this.features.map(x => {
 
       if (x.name === "Name") {
-        yScales[x.name] = d3.scalePoint()
+        this.yScales[x.name] = d3.scalePoint()
           .domain(newdataset.map(function (d) { return d.Name; }))
           .range([this.padding, this.height - this.padding])
       }
       else {
-        yScales[x.name] = d3.scaleLinear()
+        this.yScales[x.name] = d3.scaleLinear()
           .domain([0, 100])
           .range([this.height - this.padding, this.padding])
       }
     })
 
     var yAxis = {};
-    Object.entries(yScales).map(x => {
+    Object.entries(this.yScales).map(x => {
       yAxis[x[0]] = d3.axisLeft(x[1])
     })
 
@@ -210,20 +216,6 @@ class SteerableParacoords {
         .on('brush', (event) => brusheventHandler(event, x[0]))
         .on('end', (event) => brusheventHandler(event, x[0]))
     })*/
-
-    function linePath(d) {
-      var lineGenerator = d3.line()
-      const tempdata = Object.entries(d).filter(x => x[0])
-      let points = []
-      this.newfeatures.map(newfeature => {
-        tempdata.map(x => {
-          if (newfeature === x[0]) {
-            points.push([this.xScales(newfeature), yScales[newfeature](x[1])])
-          }
-        })
-      })
-      return (lineGenerator(points))
-    }
 
     var highlight = function (d) {
       var selected_student = d.target.__data__.Name
@@ -268,7 +260,7 @@ class SteerableParacoords {
       .data(this.data)
       .enter()
       .append('path')
-      .attr('d', linePath.bind(this))
+      .attr('d', this.linePath.bind(this))
 
     active = svg.append('g')
       .attr('class', 'active')
@@ -277,7 +269,7 @@ class SteerableParacoords {
       .enter()
       .append('path')
       .attr("class", function (d) { return "line " + d.Name })
-      .attr('d', linePath.bind(this))
+      .attr('d', this.linePath.bind(this))
       .style("opacity", 0.5)
       .on("mouseover", highlight)
       .on("mouseleave", doNotHighlight)
@@ -319,10 +311,24 @@ class SteerableParacoords {
       .on("click", invert);
 
     function invert(event, d) {
-      yScales[d.name] = d3.scaleLinear()
-        .domain(yScales[d.name].domain().reverse())
+      this.yScales[d.name] = d3.scaleLinear()
+        .domain(this.yScales[d.name].domain().reverse())
         .range([this.padding, this.height - this.padding]);
     }
+  }
+
+  linePath(d) {
+    var lineGenerator = d3.line()
+    const tempdata = Object.entries(d).filter(x => x[0])
+    let points = []
+    this.newfeatures.map(newfeature => {
+      tempdata.map(x => {
+        if (newfeature === x[0]) {
+          points.push([this.xScales(newfeature), this.yScales[newfeature](x[1])])
+        }
+      })
+    })
+    return (lineGenerator(points))
   }
 
 
