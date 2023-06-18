@@ -9,12 +9,12 @@ class SteerableParacoords {
   private brush_width: number;
   private filters: {};
 
-  constructor(data?, newfeatures?) {
+  constructor(data?, newFeatures?) {
     if(data) {
       this.data = data;
     }
-    if(newfeatures) {
-      this.newFeatures = newfeatures;
+    if(newFeatures) {
+      this.newFeatures = newFeatures;
     }
     this.width = 1200;
     this.height = 400;
