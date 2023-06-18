@@ -8,6 +8,10 @@ class SteerableParacoords {
   private padding: number;
   private brush_width: number;
   private filters: {};
+  features: any[];
+  xScales: any;
+  dragging: any;
+
 
   constructor(data, newfeatures) {
     this.data = data;
@@ -17,6 +21,10 @@ class SteerableParacoords {
     this.padding = 50;
     this.brush_width = 20;
     this.filters = {};
+    this.features = [];
+    this.xScales = null;
+    this.dragging = {};
+
   }
 
   // TODO implement
@@ -72,7 +80,7 @@ class SteerableParacoords {
 
   // TODO refactor
   GenerateSVG() {
-    var features = [];
+    // var features = [];
     var newdataset = [];
 
     this.data.forEach(obj => {
@@ -84,14 +92,14 @@ class SteerableParacoords {
     })
 
     var temp = Object.keys(newdataset[0])
-    temp.forEach(element => features.push({ 'name': element }))
+    temp.forEach(element => this.features.push({ 'name': element }))
 
-    var xScales = d3.scalePoint()
+    this.xScales = d3.scalePoint()
       .range([this.width - this.padding, this.padding])
-      .domain(features.map(x => x.name))
+      .domain(this.features.map(x => x.name))
 
     var yScales = {};
-    features.map(x => {
+    this.features.map(x => {
 
       if (x.name === "Name") {
         yScales[x.name] = d3.scalePoint()
@@ -153,10 +161,10 @@ class SteerableParacoords {
       var lineGenerator = d3.line()
       const tempdata = Object.entries(d).filter(x => x[0])
       let points = []
-      this.newfeatures.map(function (newfeature) {
-        tempdata.map(function (x) {
+      this.newfeatures.map(newfeature => {
+        tempdata.map(x => {
           if (newfeature === x[0]) {
-            points.push([xScales(newfeature), yScales[newfeature](x[1])])
+            points.push([this.xScales(newfeature), yScales[newfeature](x[1])])
           }
         })
       })
@@ -189,13 +197,14 @@ class SteerableParacoords {
         .style('stroke', '#0081af')
     }
 
-    var dragging = {},
-      active,
-      inactive;
+    // var dragging = {},
+    //   active,
+    //   inactive;
+    var active, inactive;
 
-    function position(d) {
-      var v = dragging[d];
-      return v == null ? xScales(d) : v;
+    function position(this: any, d: any, paracoords: any) {
+      var v = paracoords.dragging[d];
+      return v == null ? paracoords.xScales(d) : v;
     }
 
     function transition(g) {
@@ -230,33 +239,35 @@ class SteerableParacoords {
 
 
     const featureAxisG = svg.selectAll('g.feature')
-      .data(features)
+      .data(this.features)
       .enter()
       .append('g')
       .attr('class', 'feature')
-      .attr('transform', d => ('translate(' + xScales(d.name) + ')'))
+      .attr('transform', d => ('translate(' + this.xScales(d.name) + ')'))
       .call(d3.drag()
 
-        .on("start", function (d) {
-          this.__origin__ = xScales((d.subject).name)
-          dragging[(d.subject).name] = this.__origin__
-          inactive.attr("visibility", "hidden")
-       })
+          .on("start", function (paracoords) {
+              return function (d) {
+                  this.__origin__ = paracoords.xScales((d.subject).name);
+                  paracoords.dragging[(d.subject).name] = this.__origin__;
+                  inactive.attr("visibility", "hidden");
+              };
+          }(this))
           .on("drag", function (paracoords) {
             return function (d) {
-              dragging[(d.subject).name] = Math.min(paracoords.width, Math.max(0, this.__origin__ += d.dx));
+              paracoords.dragging[(d.subject).name] = Math.min(paracoords.width, Math.max(0, this.__origin__ += d.dx));
               active.attr('d', linePath.bind(paracoords));
-              paracoords.newfeatures.sort(function (a, b) { return position(b) - position(a); });
-              xScales.domain(paracoords.newfeatures);
-              featureAxisG.attr("transform", function (d) { return "translate(" + position(d.name) + ")"; });
+              paracoords.newfeatures.sort((a, b) => { return position(b, paracoords) - position(a, paracoords); });
+              paracoords.xScales.domain(paracoords.newfeatures);
+              featureAxisG.attr("transform", (d) => { return "translate(" + position(d.name, paracoords) + ")"; });
             };
           }(this))
           .on("end", function (paracoords) {
             return function (d) {
               console.log(paracoords);
               delete this.__origin__;
-              delete dragging[(d.subject).name];
-              transition(d3.select(this)).attr('transform', d => ('translate(' + xScales(d.name) + ')'));
+              delete paracoords.dragging[(d.subject).name];
+              transition(d3.select(this)).attr('transform', d => ('translate(' + paracoords.xScales(d.name) + ')'));
               transition(active).attr('d', linePath.bind(paracoords));
               inactive.attr('d', linePath.bind(paracoords))
                   .transition()
@@ -295,6 +306,12 @@ class SteerableParacoords {
         .range([this.padding, this.height - this.padding]);
     }
   }
+
+  // onDragDimensionStart(this: any, d: any) {
+  //   this.__origin__ = paracoords.xScales(d.subject.name);
+  //   paracoords.dragging[d.subject.name] = this.__origin__;
+  //   inactive.attr("visibility", "hidden");
+  // }
 }
 
 
