@@ -78,6 +78,24 @@ class SteerableParacoords {
 
   }
 
+
+  position(this: any, d: any, paracoords: any) {
+    var v = paracoords.dragging[d];
+    return v == null ? paracoords.xScales(d) : v;
+  }
+
+  onDragStartEventHandler(paracoords)
+  {
+    {
+      return function onDragStart (d)
+      {
+        this.__origin__ = paracoords.xScales((d.subject).name);
+        paracoords.dragging[(d.subject).name] = this.__origin__;
+        // inactive.attr("visibility", "hidden");
+      }
+    }
+  }
+
   // TODO refactor
   GenerateSVG() {
     // var features = [];
@@ -202,11 +220,6 @@ class SteerableParacoords {
     //   inactive;
     var active, inactive;
 
-    function position(this: any, d: any, paracoords: any) {
-      var v = paracoords.dragging[d];
-      return v == null ? paracoords.xScales(d) : v;
-    }
-
     function transition(g) {
       return g.transition().duration(50);
     }
@@ -245,26 +258,19 @@ class SteerableParacoords {
       .attr('class', 'feature')
       .attr('transform', d => ('translate(' + this.xScales(d.name) + ')'))
       .call(d3.drag()
+          .on("start", this.onDragStartEventHandler(this))
 
-          .on("start", function (paracoords) {
-              return function (d) {
-                  this.__origin__ = paracoords.xScales((d.subject).name);
-                  paracoords.dragging[(d.subject).name] = this.__origin__;
-                  inactive.attr("visibility", "hidden");
-              };
-          }(this))
           .on("drag", function (paracoords) {
             return function (d) {
               paracoords.dragging[(d.subject).name] = Math.min(paracoords.width, Math.max(0, this.__origin__ += d.dx));
               active.attr('d', linePath.bind(paracoords));
-              paracoords.newfeatures.sort((a, b) => { return position(b, paracoords) - position(a, paracoords); });
+              paracoords.newfeatures.sort((a, b) => { return paracoords.position(b, paracoords) - paracoords.position(a, paracoords); });
               paracoords.xScales.domain(paracoords.newfeatures);
-              featureAxisG.attr("transform", (d) => { return "translate(" + position(d.name, paracoords) + ")"; });
+              featureAxisG.attr("transform", (d) => { return "translate(" + paracoords.position(d.name, paracoords) + ")"; });
             };
           }(this))
           .on("end", function (paracoords) {
             return function (d) {
-              console.log(paracoords);
               delete this.__origin__;
               delete paracoords.dragging[(d.subject).name];
               transition(d3.select(this)).attr('transform', d => ('translate(' + paracoords.xScales(d.name) + ')'));
