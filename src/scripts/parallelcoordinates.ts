@@ -13,6 +13,8 @@ class SteerableParacoords {
   dragging: any;
   private featureAxisG: any;
   yScales: {};
+  private active: any;
+  private inactive: any;
 
 
 
@@ -29,6 +31,8 @@ class SteerableParacoords {
     this.dragging = {};
     this.featureAxisG = null;
     this.yScales = {};
+    this.active = null;
+    this.inactive = null;
   }
 
   setupAxis()
@@ -100,7 +104,7 @@ class SteerableParacoords {
       {
         this.__origin__ = paracoords.xScales((d.subject).name);
         paracoords.dragging[(d.subject).name] = this.__origin__;
-        // inactive.attr("visibility", "hidden");
+        paracoords.inactive.attr("visibility", "hidden");
       }
     }
   }
@@ -109,7 +113,7 @@ class SteerableParacoords {
     {
       return function onDrag(d) {
         paracoords.dragging[(d.subject).name] = Math.min(paracoords.width, Math.max(0, this.__origin__ += d.dx));
-        // active.attr('d', linePath.bind(paracoords));
+        paracoords.active.attr('d', paracoords.linePath.bind(paracoords));
         paracoords.newfeatures.sort((a, b) => { return paracoords.position(b, paracoords) - paracoords.position(a, paracoords); });
         paracoords.xScales.domain(paracoords.newfeatures);
         paracoords.featureAxisG.attr("transform", (d) => { return "translate(" + paracoords.position(d.name, paracoords) + ")"; });
@@ -128,12 +132,12 @@ class SteerableParacoords {
         delete this.__origin__;
         delete paracoords.dragging[(d.subject).name];
         paracoords.transition(d3.select(this)).attr('transform', d => ('translate(' + paracoords.xScales(d.name) + ')'));
-        // transition(active).attr('d', linePath.bind(paracoords));
-        // inactive.attr('d', linePath.bind(paracoords))
-        //     .transition()
-        //     .delay(5)
-        //     .duration(0)
-        //     .attr("visibility", null);
+        paracoords.transition(paracoords.active).attr('d', paracoords.linePath.bind(paracoords));
+        paracoords.inactive.attr('d', paracoords.linePath.bind(paracoords))
+            .transition()
+            .delay(5)
+            .duration(0)
+            .attr("visibility", null);
       };
     }
   }
@@ -243,8 +247,6 @@ class SteerableParacoords {
         .style('stroke', '#0081af')
     }
 
-    var active, inactive;
-
     function transition(g) {
       return g.transition().duration(50);
     }
@@ -254,7 +256,7 @@ class SteerableParacoords {
       .append('svg')
       .attr("viewBox", "0 0 1200 400")
 
-    inactive = svg.append('g')
+    this.inactive = svg.append('g')
       .attr('class', 'inactive')
       .selectAll('path')
       .data(this.data)
@@ -262,7 +264,7 @@ class SteerableParacoords {
       .append('path')
       .attr('d', this.linePath.bind(this))
 
-    active = svg.append('g')
+    this.active = svg.append('g')
       .attr('class', 'active')
       .selectAll('path')
       .data(this.data)
@@ -330,8 +332,7 @@ class SteerableParacoords {
     })
     return (lineGenerator(points))
   }
-
-
+  
 }
 
 
