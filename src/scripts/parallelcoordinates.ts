@@ -7,7 +7,6 @@ class SteerableParacoords {
   private height: number;
   private padding: number;
   private brush_width: number;
-  private filters: {};
 
   constructor(data, newfeatures) {
     this.data = data;
@@ -16,7 +15,6 @@ class SteerableParacoords {
     this.height = 400;
     this.padding = 50;
     this.brush_width = 20;
-    this.filters = {};
   }
 
   // TODO implement
@@ -110,7 +108,7 @@ class SteerableParacoords {
       yAxis[x[0]] = d3.axisLeft(x[1])
     })
 
-
+    var filters = {}
     const brusheventHandler = function (event, features) {
       console.log(this)
       if (event.sourceEvent && event.sourceEvent.type === 'zoom')
@@ -119,10 +117,10 @@ class SteerableParacoords {
         return;
       }
       if (event.selection != null) {
-        this.filters[features] = event.selection.map(() => yScales[features])
+        filters[features] = event.selection.map(d => yScales[features].invert(d))
       } else {
-        if (features in this.filters)
-          delete (this.filters[features])
+        if (features in filters)
+          delete (filters[features])
       }
       applyFilters()
     }
@@ -133,7 +131,7 @@ class SteerableParacoords {
     }
 
     const selected = function (d) {
-      const tempFilters = Object.entries(this.filters)
+      const tempFilters = Object.entries(filters)
       return tempFilters.every(f => {
         return f[1][1] <= d[f[0]] && d[f[0]] <= f[1][0]
       })
