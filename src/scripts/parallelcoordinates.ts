@@ -163,9 +163,13 @@ class SteerableParacoords {
       return (lineGenerator(points))
     }
 
-    /*var highlight = function (d) {
-      selected_student = d.target.__data__.Name
-      selectedstudent.innerHTML = selected_student;
+    var highlight = function (d) {
+      var selected_student = d.target.__data__.Name
+
+      const selectedStudentElement = document.getElementById("selectedstudent");
+      if (selectedStudentElement) {
+        selectedStudentElement.innerHTML = selected_student;
+      }
 
       // Second the hovered specie takes its color
       d3.selectAll("." + selected_student)
@@ -173,17 +177,17 @@ class SteerableParacoords {
         .style("stroke", selected_student)
         .style("opacity", "5")
         .style('stroke', 'red')
-      //.style({'stroke': 'red', 'fill': 'none', 'stroke-width': '1px'})
     }
 
     // Unhighlight
-    var doNotHighlight = function () {
+    var doNotHighlight = function (d) {
+      var selected_student = d.target.__data__.Name
       d3.selectAll("." + selected_student)
         .transition().duration(5)
         .style("stroke", selected_student)
         .style("opacity", ".4")
         .style('stroke', '#0081af')
-    }*/
+    }
 
     var dragging = {},
       active,
@@ -220,8 +224,8 @@ class SteerableParacoords {
       .attr("class", function (d) { return "line " + d.Name })
       .attr('d', linePath.bind(this))
       .style("opacity", 0.5)
-      //.on("mouseover", highlight)
-      //.on("mouseleave", doNotHighlight)
+      .on("mouseover", highlight)
+      .on("mouseleave", doNotHighlight)
 
 
 
