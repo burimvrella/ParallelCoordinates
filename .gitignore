@@ -8,3 +8,7 @@
 node_modules/
 
 lib/parallelcoordinates.js
+
+package-lock.json
+
+.vscode/

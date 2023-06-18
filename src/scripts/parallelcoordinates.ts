@@ -111,7 +111,8 @@ class SteerableParacoords {
     })
 
 
-    /*const brusheventHandler = function (event, features) {
+    const brusheventHandler = function (event, features) {
+      console.log(this)
       if (event.sourceEvent && event.sourceEvent.type === 'zoom')
         return;
       if (features === 'Name') {
@@ -147,7 +148,7 @@ class SteerableParacoords {
         .extent(extent)
         .on('brush', (event) => brusheventHandler(event, x[0]))
         .on('end', (event) => brusheventHandler(event, x[0]))
-    })*/
+    })
 
     function linePath(d) {
       var lineGenerator = d3.line()
@@ -201,8 +202,6 @@ class SteerableParacoords {
     function transition(g) {
       return g.transition().duration(50);
     }
-
-
     const svg = d3.select("#parallelcoords")
       .append('svg')
       .attr("viewBox", "0 0 1200 400")
@@ -226,9 +225,7 @@ class SteerableParacoords {
       .style("opacity", 0.5)
       .on("mouseover", highlight)
       .on("mouseleave", doNotHighlight)
-
-
-
+ 
     const featureAxisG = svg.selectAll('g.feature')
       .data(features)
       .enter()
@@ -276,7 +273,7 @@ class SteerableParacoords {
         d3.select(this)
           .append('g')
           .attr('class', 'brush')
-          //.call(yBrushes[d.name]);
+          .call(yBrushes[d.name]);
       });
 
     featureAxisG
