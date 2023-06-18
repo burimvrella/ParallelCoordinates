@@ -2,16 +2,20 @@ declare const d3: any;
 
 class SteerableParacoords {
   private data: any;
-  private newfeatures: any;
-  width: number;
+  private newFeatures: any;
+  private width: number;
   private height: number;
   private padding: number;
   private brush_width: number;
   private filters: {};
 
-  constructor(data, newfeatures) {
-    this.data = data;
-    this.newfeatures = newfeatures;
+  constructor(data?, newfeatures?) {
+    if(data) {
+      this.data = data;
+    }
+    if(newfeatures) {
+      this.newFeatures = newfeatures;
+    }
     this.width = 1200;
     this.height = 400;
     this.padding = 50;
@@ -22,7 +26,19 @@ class SteerableParacoords {
   // TODO implement
   loadCSV(csv)
   {
+    var tmp_data = d3.csvParse(csv);
+    this.data = tmp_data.sort((a,b) => a.Name.toLowerCase() > b.Name.toLowerCase() ? 1 : -1);
+  }
 
+  //not happy with this, but at the moment we need it
+  getData(): any
+  {
+    return this.data;
+  }
+
+  setFeatures(newFeatures): void
+  {
+    this.newFeatures = newFeatures;
   }
 
   invert(dimension)
@@ -77,7 +93,7 @@ class SteerableParacoords {
 
     this.data.forEach(obj => {
       var newdata = {};
-      this.newfeatures.forEach(feature => {
+      this.newFeatures.forEach(feature => {
         newdata[feature] = obj[feature]
       })
       newdataset.push(newdata)
@@ -153,7 +169,7 @@ class SteerableParacoords {
       var lineGenerator = d3.line()
       const tempdata = Object.entries(d).filter(x => x[0])
       let points = []
-      this.newfeatures.map(function (newfeature) {
+      this.newFeatures.map(function (newfeature) {
         tempdata.map(function (x) {
           if (newfeature === x[0]) {
             points.push([xScales(newfeature), yScales[newfeature](x[1])])
@@ -246,8 +262,8 @@ class SteerableParacoords {
        .on("drag", function (d) {
          dragging[(d.subject).name] = Math.min(this.width, Math.max(0, this.__origin__ += d.dx));
          active.attr('d', linePath);
-         this["newfeatures"].sort(function (a, b) { return position(b) - position(a); });
-         xScales.domain(this["newfeatures"]);
+         this["newFeatures"].sort(function (a, b) { return position(b) - position(a); });
+         xScales.domain(this["newFeatures"]);
          featureAxisG.attr("transform", function (d) { return "translate(" + position(d.name) + ")"; })
        })
        .on("end", function (d) {
