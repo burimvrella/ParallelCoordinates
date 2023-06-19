@@ -16,6 +16,7 @@ class SteerableParacoords {
   private active: any;
   private inactive: any;
   private newDataset: any;
+  yBrushes: {};
 
   constructor(data?, newFeatures?) {
     if(data) {
@@ -37,6 +38,7 @@ class SteerableParacoords {
     this.active = null;
     this.inactive = null;
     this.newDataset = [];
+    this.yBrushes = {};
   }
 
   // TODO implement
@@ -102,7 +104,6 @@ class SteerableParacoords {
 
   }
 
-
   position(this: any, d: any, paracoords: any) {
     var v = paracoords.dragging[d];
     return v == null ? paracoords.xScales(d) : v;
@@ -167,7 +168,7 @@ class SteerableParacoords {
   }
 
   setupScales()
-  {
+{
     this.features.map(x => {
 
       if (x.name === "Name") {
@@ -187,7 +188,59 @@ class SteerableParacoords {
         .domain(this.features.map(x => x.name))
   }
 
+  setupBrush()
+  {
+    Object.entries(this.yScales).map(x => {
 
+      let extent = [[-(this.brushWidth / 2), this.padding - 1],
+                    [this.brushWidth / 2, this.height - this.padding]]
+
+      this.yBrushes[x[0]] = d3.brushY()
+        .extent(extent)
+        .on('brush',this.onBrushEventHandler(this))
+        .on('end', this.onBrushEventHandler(this))
+    });
+    return this.yBrushes
+  }
+
+  onBrushEventHandler(paracoords) {
+    {
+      return function brushEventHandler(event,features) {
+        if (event.sourceEvent && event.sourceEvent.type === 'zoom')
+        return;
+        if (paracoords.features === 'Name') {
+          return;
+        }
+        if (event.selection != null) {
+            const remappedSelection = event.selection.map((x) => {
+                const scale = paracoords.yScales[features.name];// Get the appropriate scale based on features
+                return scale.invert(x); // Remap the selection value
+            });
+            paracoords.filters[features.name] = remappedSelection;
+        } else {
+          if (features.name in paracoords.filters)
+            delete (paracoords.filters[features.name])
+        }
+        paracoords.applyFilters();
+      };
+    }
+  }
+
+  applyFilters() {
+    d3.select('g.active').selectAll('path')
+    .style('display', d => (this.selected(d) ? null : 'none'))
+  }
+
+  selected(d) {
+    const tempFilters = Object.entries(this.filters)
+    return tempFilters.every(f => {
+      return f[1][1] <= d[f[0]] && d[f[0]] <= f[1][0];
+    });
+  }
+
+
+
+  
   // TODO refactor
   generateSVG() {
     this.prepareData();
@@ -198,44 +251,7 @@ class SteerableParacoords {
       yAxis[x[0]] = d3.axisLeft(x[1])
     })
 
-
-    /*const brusheventHandler = function (event, features) {
-      if (event.sourceEvent && event.sourceEvent.type === 'zoom')
-        return;
-      if (features === 'Name') {
-        return;
-      }
-      if (event.selection != null) {
-        this.filters[features] = event.selection.map(() => yScales[features])
-      } else {
-        if (features in this.filters)
-          delete (this.filters[features])
-      }
-      applyFilters()
-    }
-
-    const applyFilters = function () {
-      d3.select('g.active').selectAll('path')
-        .style('display', d => (selected(d) ? null : 'none'))
-    }
-
-    const selected = function (d) {
-      const tempFilters = Object.entries(this.filters)
-      return tempFilters.every(f => {
-        return f[1][1] <= d[f[0]] && d[f[0]] <= f[1][0]
-      })
-
-    }
-
-    const yBrushes = {};
-    Object.entries(yScales).map(x => {
-      let extent = [[-(this.brushWidth / 2), this.padding - 1],
-      [this.brushWidth / 2, this.height - this.padding]]
-      yBrushes[x[0]] = d3.brushY()
-        .extent(extent)
-        .on('brush', (event) => brusheventHandler(event, x[0]))
-        .on('end', (event) => brusheventHandler(event, x[0]))
-    })*/
+    var brushes = this.setupBrush();
 
     const svg = d3.select("#parallelcoords")
         .append('svg')
@@ -285,7 +301,7 @@ class SteerableParacoords {
           d3.select(this)
               .append('g')
               .attr('class', 'brush')
-          //.call(yBrushes[d.name]);
+              .call(brushes[d.name]);
         });
 
     this.featureAxisG
@@ -332,7 +348,7 @@ class SteerableParacoords {
         .style('stroke', 'red')
   }
 
-  doNotHighlight (d) {
+  doNotHighlight(d) {
     var selected_student = d.target.__data__.Name
     d3.selectAll("." + selected_student)
         .transition().duration(5)
