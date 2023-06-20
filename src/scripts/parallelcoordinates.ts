@@ -159,10 +159,11 @@ class SteerableParacoords {
   onInvert(paracoords){
     {
       return function invert(event,d){
-        console.log([paracoords.padding, paracoords.height - paracoords.padding])
-        paracoords.yScales[d.name] = d3.scaleLinear()
-        .domain(paracoords.yScales[d.name].domain().reverse())
-        .range([paracoords.height - paracoords.padding, paracoords.padding,]);
+        console.log(this.parentElement.childNodes[0])
+        d3.select(this.parentElement.childNodes[0])
+            .call(paracoords.yAxis[d.name].scale(paracoords.yScales[d.name].domain(paracoords.yScales[d.name].domain().reverse())))
+          .transition()
+
       }
     }
   }
@@ -182,6 +183,7 @@ class SteerableParacoords {
 
   setupScales()
 {
+    //TODO check if intager and if then get all values for max and min 
     this.features.map(x => {
 
       if (x.name === "Name") {
@@ -190,8 +192,10 @@ class SteerableParacoords {
             .range([this.padding, this.height - this.padding])
       }
       else {
+        var max = Math.max(...this.newDataset.map(o => o[x.name]))
+        var min = Math.min(...this.newDataset.map(o => o[x.name]))
         this.yScales[x.name] = d3.scaleLinear()
-            .domain([0, 100])
+            .domain([min, max]).nice()
             .range([this.height - this.padding, this.padding])
       }
     })
@@ -321,10 +325,17 @@ class SteerableParacoords {
         .append("text")
         .attr("text-anchor", "middle")
         .attr('y', this.padding / 2)
-        .text(d => d.name)
-        .on("click", this.onInvert(this));
-        
+        .text(d => d.name);
+        //.on("click", this.onInvert(this));
 
+    this.featureAxisG
+            .append("rect")
+            .attr('y', this.padding / 2 - 20)
+            .attr('width', 10)
+            .attr('height', 5)
+            .attr('stroke', 'black')
+            .attr('fill', '#69a3b2')
+            .on("click", this.onInvert(this)); 
   }
 
   linePath(d) {
