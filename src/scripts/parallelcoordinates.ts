@@ -17,6 +17,7 @@ class SteerableParacoords {
   private inactive: any;
   private newDataset: any;
   yBrushes: {};
+  yAxis: {};
 
   constructor(data?, newFeatures?) {
     if(data) {
@@ -39,6 +40,7 @@ class SteerableParacoords {
     this.inactive = null;
     this.newDataset = [];
     this.yBrushes = {};
+    this.yAxis = {};
   }
 
   // TODO implement
@@ -154,6 +156,17 @@ class SteerableParacoords {
     }
   }
 
+  onInvert(paracoords){
+    {
+      return function invert(event,d){
+        console.log([paracoords.padding, paracoords.height - paracoords.padding])
+        paracoords.yScales[d.name] = d3.scaleLinear()
+        .domain(paracoords.yScales[d.name].domain().reverse())
+        .range([paracoords.height - paracoords.padding, paracoords.padding,]);
+      }
+    }
+  }
+
   prepareData()
   {
     this.data.forEach(obj => {
@@ -186,6 +199,14 @@ class SteerableParacoords {
     this.xScales = d3.scalePoint()
         .range([this.width - this.padding, this.padding])
         .domain(this.features.map(x => x.name))
+  }
+
+  setupYAxis() 
+  {
+    Object.entries(this.yScales).map(x => {
+        this.yAxis[x[0]] = d3.axisLeft(x[1]);
+    });
+    return this.yAxis;
   }
 
   setupBrush()
@@ -237,20 +258,12 @@ class SteerableParacoords {
       return f[1][1] <= d[f[0]] && d[f[0]] <= f[1][0];
     });
   }
-
-
-
   
   // TODO refactor
   generateSVG() {
     this.prepareData();
     this.setupScales();
-
-    var yAxis = {};
-    Object.entries(this.yScales).map(x => {
-      yAxis[x[0]] = d3.axisLeft(x[1])
-    })
-
+    var yaxis = this.setupYAxis();
     var brushes = this.setupBrush();
 
     const svg = d3.select("#parallelcoords")
@@ -293,7 +306,7 @@ class SteerableParacoords {
         .append('g')
         .each(function (d) {
           d3.select(this)
-              .call(yAxis[d.name]);
+              .call(yaxis[d.name]);
         });
 
     this.featureAxisG
@@ -309,13 +322,9 @@ class SteerableParacoords {
         .attr("text-anchor", "middle")
         .attr('y', this.padding / 2)
         .text(d => d.name)
-        .on("click", invert);
+        .on("click", this.onInvert(this));
+        
 
-    function invert(event, d) {
-      this.yScales[d.name] = d3.scaleLinear()
-          .domain(this.yScales[d.name].domain().reverse())
-          .range([this.padding, this.height - this.padding]);
-    }
   }
 
   linePath(d) {
@@ -339,7 +348,6 @@ class SteerableParacoords {
     if (selectedStudentElement) {
       selectedStudentElement.innerHTML = selected_student;
     }
-
     // Second the hovered specie takes its color
     d3.selectAll("." + selected_student)
         .transition().duration(5)

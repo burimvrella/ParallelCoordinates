@@ -8,8 +8,8 @@
   <script>var exports = {};</script>
 
   <!-- TO DOWNLOAD -->
-  <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
-  <script src="https://d3js.org/d3.v7.js"></script>
+  <script src="../jquery-3.7.0.js"></script>
+  <script src="../d3.v7.js"></script>
 
   <script src="main.js"></script>
   <script src="../parallelcoordinates.js" > </script>
@@ -24,20 +24,20 @@
 <div><h1>Parallel Coordinates</h1></div>
 
 <form id="uploadFile">
-  <label for="file" class="button">Select File</label>
+  <label for="file" class="button" id="filename">Select File</label>
   <input id="file" name="file" type="file" style="display: none;" />
-  <span id="file-upload-filename"></span>
+  <span id="file-upload-filename">No file chosen</span>
   <input class="button" id="submit" type="submit" value="Open"/>
 </form>
 
 <div id="selectfeaturs">
-  <button class="button" id="choosenfeatures" type="button"> Dimensions </button>
-  <button class="button" id="delete" type="button" > Delete Coordinates</button>
+  <button class="button" id="choosenfeatures" type="button"> Create Parallel Coordinates</button>
+  <button class="button" id="delete" type="button" > Delete Parallel Coordinates</button>
 </div>
 <span id="error"></span>
 
 <div class="student">
-  <div id="name">Hovered Student:</div>
+  <div id="name">Hovered Line:</div>
   <div id="selectedstudent"> </div>
 </div>
 
