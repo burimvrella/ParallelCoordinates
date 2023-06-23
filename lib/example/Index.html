@@ -11,8 +11,9 @@
   <script src="../jquery-3.7.0.js"></script>
   <script src="../d3.v7.js"></script>
 
-  <script src="main.js"></script>
   <script src="../parallelcoordinates.js" > </script>
+  <script src="main.js"></script>
+
 
 
   <link rel="shortcut icon" href="#">
@@ -21,55 +22,22 @@
 </head>
 <body>
 
-<div><h1>Parallel Coordinates</h1></div>
 
-<form id="uploadFile">
-  <label for="file" class="button" id="filename">Select File</label>
-  <input id="file" name="file" type="file" style="display: none;" />
-  <span id="file-upload-filename">No file chosen</span>
-  <input class="button" id="submit" type="submit" value="Open"/>
-</form>
+  <div><h1>Parallel Coordinates</h1></div>
 
-<div id="selectfeaturs">
-  <button class="button" id="choosenfeatures" type="button"> Create Parallel Coordinates</button>
-  <button class="button" id="delete" type="button" > Delete Parallel Coordinates</button>
-</div>
-<span id="error"></span>
+  <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event);">
+  <button class="button" onclick="openFileDialog()">Upload File</button>
+  <div id="checkboxContainer"></div>
 
-<div class="student">
-  <div id="name">Hovered Line:</div>
-  <div id="selectedstudent"> </div>
-</div>
 
-<!--<div>-->
-<!--  <button class="button" id="choosenfeatures" type="button" onclick="save_as_svg()">click</button>-->
-<!--</div>-->
+  <div class="student">
+    <div id="name">Hovered Line:</div>
+    <div id="selectedstudent"> </div>
+  </div>
 
-<div id="parallelcoords"></div>
+  <div id="parallelcoords"></div>
 
-<!-- <script src="paracoords.js"></script>
 
-<script>
-
-   // Sample data
- const data = [
-   { Name: "John", Age: 25, Height: 180, Weight: 75 },
-   { Name: "Jane", Age: 30, Height: 165, Weight: 60 },
-   { Name: "Bob", Age: 35, Height: 175, Weight: 80 },
-   // Add more data entries as needed
- ];
-
- // Define the features to display
- const features = ["Age", "Height", "Weight"];
-
- // Create an instance of SteerableParacoords
- //const paracoords = new SteerableParacoords(data, features);
-
- // Call the setup method to generate the visualization
- // paracoords.GenerateSVG();
-</script>
-
--->
 </body>
 
 </html>
