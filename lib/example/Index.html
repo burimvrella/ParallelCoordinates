@@ -7,14 +7,14 @@
 
   <script>var exports = {};</script>
 
-  <!-- TO DOWNLOAD -->
-  <script src="../jquery-3.7.0.js"></script>
-  <script src="../d3.v7.js"></script>
+  <!-- Plugins -->
+  <script src="../plugins/d3.v7.js"></script>
+  <script src="../plugins/popper.min.js"></script>
+  <script src="../plugins/tippy-bundle.umd.js"></script>
 
   <script src="../parallelcoordinates.js" > </script>
+
   <script src="main.js"></script>
-
-
 
   <link rel="shortcut icon" href="#">
   <link rel="stylesheet" href="styles.css">
@@ -28,12 +28,6 @@
   <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event);">
   <button class="button" onclick="openFileDialog()">Upload File</button>
   <div id="checkboxContainer"></div>
-
-
-  <div class="student">
-    <div id="name">Hovered Line:</div>
-    <div id="selectedstudent"> </div>
-  </div>
 
   <div id="parallelcoords"></div>
 

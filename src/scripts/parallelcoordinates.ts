@@ -1,4 +1,5 @@
 declare const d3: any;
+declare const tippy: any;
 
 class SteerableParacoords {
   private data: any;
@@ -268,6 +269,7 @@ class SteerableParacoords {
   generateSVG() {
     this.prepareData();
     this.setupScales();
+    var self = this;
     var yaxis = this.setupYAxis();
     var brushes = this.setupBrush();
 
@@ -294,6 +296,18 @@ class SteerableParacoords {
         .style("opacity", 0.5)
         .on("mouseover", this.highlight)
         .on("mouseleave", this.doNotHighlight)
+        .each(function(d) {
+          const lineData = d; // Access the line data associated with the current line element
+          const lineElement = this; // Reference to the current line element
+          tippy(lineElement, {
+            content: `-`,
+            followCursor: 'initial',
+            onShow(instance) {
+              var dimensionName = self.features[self.features.length - 1].name;
+              instance.setContent(`${lineData[dimensionName]}`);
+            }
+          });
+        });
 
     this.featureAxisG = svg.selectAll('g.feature')
         .data(this.features)
@@ -356,10 +370,6 @@ class SteerableParacoords {
 
   highlight(d) {
     var selected_student = d.target.__data__.Name
-    const selectedStudentElement = document.getElementById("selectedstudent");
-    if (selectedStudentElement) {
-      selectedStudentElement.innerHTML = selected_student;
-    }
     // Second the hovered specie takes its color
     d3.selectAll("." + selected_student)
         .transition().duration(5)
