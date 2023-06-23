@@ -59,6 +59,7 @@ class SteerableParacoords {
   setFeatures(newFeatures): void
   {
     this.newFeatures = newFeatures;
+    this.newFeatures.reverse();
   }
 
   invert(dimension)
