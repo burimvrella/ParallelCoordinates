@@ -1,7 +1,7 @@
 declare const d3: any;
 declare const tippy: any;
 
-class SteerableParacoords {
+class SteerableParcoords {
   private data: any;
   private newFeatures: any;
   private width: number;
@@ -108,31 +108,31 @@ class SteerableParacoords {
 
   }
 
-  position(this: any, d: any, paracoords: any) {
-    var v = paracoords.dragging[d];
-    return v == null ? paracoords.xScales(d) : v;
+  position(this: any, d: any, parcoords: any) {
+    var v = parcoords.dragging[d];
+    return v == null ? parcoords.xScales(d) : v;
   }
 
-  onDragStartEventHandler(paracoords)
+  onDragStartEventHandler(parcoords)
   {
     {
       return function onDragStart (d)
       {
-        this.__origin__ = paracoords.xScales((d.subject).name);
-        paracoords.dragging[(d.subject).name] = this.__origin__;
-        paracoords.inactive.attr("visibility", "hidden");
+        this.__origin__ = parcoords.xScales((d.subject).name);
+        parcoords.dragging[(d.subject).name] = this.__origin__;
+        parcoords.inactive.attr("visibility", "hidden");
       }
     }
   }
 
-  onDragEventHandler(paracoords) {
+  onDragEventHandler(parcoords) {
     {
       return function onDrag(d) {
-        paracoords.dragging[(d.subject).name] = Math.min(paracoords.width, Math.max(0, this.__origin__ += d.dx));
-        paracoords.active.attr('d', paracoords.linePath.bind(paracoords));
-        paracoords.newFeatures.sort((a, b) => { return paracoords.position(b, paracoords) - paracoords.position(a, paracoords); });
-        paracoords.xScales.domain(paracoords.newFeatures);
-        paracoords.featureAxisG.attr("transform", (d) => { return "translate(" + paracoords.position(d.name, paracoords) + ")"; });
+        parcoords.dragging[(d.subject).name] = Math.min(parcoords.width, Math.max(0, this.__origin__ += d.dx));
+        parcoords.active.attr('d', parcoords.linePath.bind(parcoords));
+        parcoords.newFeatures.sort((a, b) => { return parcoords.position(b, parcoords) - parcoords.position(a, parcoords); });
+        parcoords.xScales.domain(parcoords.newFeatures);
+        parcoords.featureAxisG.attr("transform", (d) => { return "translate(" + parcoords.position(d.name, parcoords) + ")"; });
       };
     }
   }
@@ -142,14 +142,14 @@ class SteerableParacoords {
   }
 
 
-  onDragEndEventHandler(paracoords) {
+  onDragEndEventHandler(parcoords) {
     {
       return function onDragEnd(d) {
         delete this.__origin__;
-        delete paracoords.dragging[(d.subject).name];
-        paracoords.transition(d3.select(this)).attr('transform', d => ('translate(' + paracoords.xScales(d.name) + ')'));
-        paracoords.transition(paracoords.active).attr('d', paracoords.linePath.bind(paracoords));
-        paracoords.inactive.attr('d', paracoords.linePath.bind(paracoords))
+        delete parcoords.dragging[(d.subject).name];
+        parcoords.transition(d3.select(this)).attr('transform', d => ('translate(' + parcoords.xScales(d.name) + ')'));
+        parcoords.transition(parcoords.active).attr('d', parcoords.linePath.bind(parcoords));
+        parcoords.inactive.attr('d', parcoords.linePath.bind(parcoords))
             .transition()
             .delay(5)
             .duration(0)
@@ -158,12 +158,12 @@ class SteerableParacoords {
     }
   }
 
-  onInvert(paracoords){
+  onInvert(parcoords){
     {
       return function invert(event,d){
         console.log(this.parentElement.childNodes[0])
         d3.select(this.parentElement.childNodes[0])
-            .call(paracoords.yAxis[d.name].scale(paracoords.yScales[d.name].domain(paracoords.yScales[d.name].domain().reverse())))
+            .call(parcoords.yAxis[d.name].scale(parcoords.yScales[d.name].domain(parcoords.yScales[d.name].domain().reverse())))
           .transition()
 
       }
@@ -230,25 +230,25 @@ class SteerableParacoords {
     return this.yBrushes
   }
 
-  onBrushEventHandler(paracoords) {
+  onBrushEventHandler(parcoords) {
     {
       return function brushEventHandler(event,features) {
         if (event.sourceEvent && event.sourceEvent.type === 'zoom')
         return;
-        if (paracoords.features === 'Name') {
+        if (parcoords.features === 'Name') {
           return;
         }
         if (event.selection != null) {
             const remappedSelection = event.selection.map((x) => {
-                const scale = paracoords.yScales[features.name];// Get the appropriate scale based on features
+                const scale = parcoords.yScales[features.name];// Get the appropriate scale based on features
                 return scale.invert(x); // Remap the selection value
             });
-            paracoords.filters[features.name] = remappedSelection;
+            parcoords.filters[features.name] = remappedSelection;
         } else {
-          if (features.name in paracoords.filters)
-            delete (paracoords.filters[features.name])
+          if (features.name in parcoords.filters)
+            delete (parcoords.filters[features.name])
         }
-        paracoords.applyFilters();
+        parcoords.applyFilters();
       };
     }
   }
