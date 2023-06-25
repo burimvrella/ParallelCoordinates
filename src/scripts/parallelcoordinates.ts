@@ -160,6 +160,12 @@ class SteerableParcoords {
   onInvert(parcoords){
     {
       return function invert(event,d){
+        // invert sorting arrow
+        const textElement = d3.select(this);
+        const currentText = textElement.text();
+        const newText = currentText === '▼' ? '▲' : '▼';
+        textElement.text(newText);
+
         d3.select(this.parentElement.childNodes[0])
             .call(parcoords.yAxis[d.name].scale(parcoords.yScales[d.name].domain(parcoords.yScales[d.name].domain().reverse())))
           .transition()
@@ -349,16 +355,13 @@ class SteerableParcoords {
         .attr("text-anchor", "middle")
         .attr('y', this.padding / 2)
         .text(d => d.name);
-        //.on("click", this.onInvert(this));
 
     this.featureAxisG
-            .append("rect")
-            .attr('y', this.padding / 2 - 20)
-            .attr('width', 10)
-            .attr('height', 5)
-            .attr('stroke', 'black')
-            .attr('fill', '#69a3b2')
-            .on("click", this.onInvert(this)); 
+        .append("text")
+        .attr("text-anchor", "middle")
+        .attr('y', this.padding / 2 + 17)
+        .text('▼')
+        .on("click", this.onInvert(this));
   }
 
   linePath(d) {
