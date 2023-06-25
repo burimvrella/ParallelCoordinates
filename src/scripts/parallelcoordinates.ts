@@ -65,7 +65,6 @@ class SteerableParcoords {
 
   invert(dimension)
   {
-
   }
 
   getInversionStatus(dimension)
@@ -103,7 +102,7 @@ class SteerableParcoords {
 
   }
 
-  saveAsSCG()
+  saveAsSVG()
   {
 
   }
@@ -161,11 +160,20 @@ class SteerableParcoords {
   onInvert(parcoords){
     {
       return function invert(event,d){
-        console.log(this.parentElement.childNodes[0])
         d3.select(this.parentElement.childNodes[0])
             .call(parcoords.yAxis[d.name].scale(parcoords.yScales[d.name].domain(parcoords.yScales[d.name].domain().reverse())))
           .transition()
 
+        // force update lines
+        parcoords.active.attr('d', parcoords.linePath.bind(parcoords));
+        delete this.__origin__;
+        delete parcoords.active[d.name];
+        parcoords.transition(parcoords.active).attr('d', parcoords.linePath.bind(parcoords));
+        parcoords.inactive.attr('d', parcoords.linePath.bind(parcoords))
+            .transition()
+            .delay(5)
+            .duration(0)
+            .attr("visibility", null);
       }
     }
   }
