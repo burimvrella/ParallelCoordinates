@@ -27,10 +27,8 @@ class SteerableParcoords {
     if(newFeatures) {
       this.newFeatures = newFeatures;
     }
-    this.initContent();
   }
 
-  // TODO implement
   loadCSV(csv)
   {
     var tmp_data = d3.csvParse(csv);
@@ -49,8 +47,28 @@ class SteerableParcoords {
     this.newFeatures.reverse();
   }
 
-  invert(dimension)
-  {
+  invert(dimension) {
+    const invert_id = "#dimension_invert_" + dimension;
+    const dimension_id = "#dimension_axis_" + dimension;
+    const textElement = d3.select(invert_id);
+    const currentText = textElement.text();
+    const newText = currentText === '▼' ? '▲' : '▼';
+    textElement.text(newText);
+
+    d3.select(dimension_id)
+        .call(this.yAxis[dimension].scale(this.yScales[dimension].domain(this.yScales[dimension].domain().reverse())))
+        .transition();
+
+        // force update lines
+        this.active.attr('d', this.linePath.bind(this));
+        delete textElement.__origin__;
+        delete this.active[dimension];
+        this.transition(this.active).attr('d', this.linePath.bind(this));
+        this.inactive.attr('d', this.linePath.bind(this))
+        .transition()
+        .delay(5)
+        .duration(0)
+        .attr("visibility", null);
   }
 
   getInversionStatus(dimension)
@@ -143,30 +161,11 @@ class SteerableParcoords {
     }
   }
 
-  onInvert(parcoords){
+  onInvert(parcoords) {
     {
-      return function invert(event,d){
-        // invert sorting arrow
-        const textElement = d3.select(this);
-        const currentText = textElement.text();
-        const newText = currentText === '▼' ? '▲' : '▼';
-        textElement.text(newText);
-
-        d3.select(this.parentElement.childNodes[0])
-            .call(parcoords.yAxis[d.name].scale(parcoords.yScales[d.name].domain(parcoords.yScales[d.name].domain().reverse())))
-          .transition()
-
-        // force update lines
-        parcoords.active.attr('d', parcoords.linePath.bind(parcoords));
-        delete this.__origin__;
-        delete parcoords.active[d.name];
-        parcoords.transition(parcoords.active).attr('d', parcoords.linePath.bind(parcoords));
-        parcoords.inactive.attr('d', parcoords.linePath.bind(parcoords))
-            .transition()
-            .delay(5)
-            .duration(0)
-            .attr("visibility", null);
-      }
+      return function invert(event, d) {
+        parcoords.invert(d.name);
+      };
     }
   }
 
@@ -346,6 +345,7 @@ class SteerableParcoords {
         .append('g')
         .each(function (d) {
           d3.select(this)
+              .attr('id', 'dimension_axis_' + d.name)
               .call(yaxis[d.name]);
         });
 
@@ -367,7 +367,11 @@ class SteerableParcoords {
         .append("text")
         .attr("text-anchor", "middle")
         .attr('y', this.padding / 2 + 17)
-        .text('▼')
+        .each(function (d) {
+          d3.select(this)
+              .attr('id', 'dimension_invert_' + d.name)
+              .text('▼')
+        })
         .on("click", this.onInvert(this));
   }
 
