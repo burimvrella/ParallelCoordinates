@@ -27,21 +27,7 @@ class SteerableParcoords {
     if(newFeatures) {
       this.newFeatures = newFeatures;
     }
-    this.width = 1200;
-    this.height = 400;
-    this.padding = 50;
-    this.brushWidth = 20;
-    this.filters = {};
-    this.features = [];
-    this.xScales = null;
-    this.dragging = {};
-    this.featureAxisG = null;
-    this.yScales = {};
-    this.active = null;
-    this.inactive = null;
-    this.newDataset = [];
-    this.yBrushes = {};
-    this.yAxis = {};
+    this.initContent();
   }
 
   // TODO implement
@@ -278,14 +264,35 @@ class SteerableParcoords {
       return f[1][1] <= d[f[0]] && d[f[0]] <= f[1][0];
     });
   }
+
+  private initContent() {
+    this.width = 1200;
+    this.height = 400;
+    this.padding = 50;
+    this.brushWidth = 20;
+    this.filters = {};
+    this.features = [];
+    this.xScales = null;
+    this.dragging = {};
+    this.featureAxisG = null;
+    this.yScales = {};
+    this.active = null;
+    this.inactive = null;
+    this.newDataset = [];
+    this.yBrushes = {};
+    this.yAxis = {};
+    d3.select("svg").remove();
+  }
   
   // TODO refactor
   generateSVG() {
+    this.initContent();
     this.prepareData();
     this.setupScales();
     var self = this;
     var yaxis = this.setupYAxis();
     var brushes = this.setupBrush();
+
 
     const svg = d3.select("#parallelcoords")
         .append('svg')
