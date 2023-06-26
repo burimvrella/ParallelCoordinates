@@ -29,6 +29,10 @@ text {
   margin-left: 1px;
 }
 
+#error {
+  color: red;
+}
+
 #selectedstudent{
   float: right;
   fill: none;

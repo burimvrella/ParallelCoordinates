@@ -19,6 +19,7 @@ class SteerableParcoords {
   private newDataset: any;
   yBrushes: {};
   yAxis: {};
+  featureOrder: any;
 
   constructor(data?, newFeatures?) {
     if(data) {
@@ -42,6 +43,7 @@ class SteerableParcoords {
     this.newDataset = [];
     this.yBrushes = {};
     this.yAxis = {};
+    this.featureOrder = [];
   }
 
   // TODO implement
@@ -60,6 +62,7 @@ class SteerableParcoords {
   setFeatures(newFeatures): void
   {
     this.newFeatures = newFeatures;
+    this.featureOrder = newFeatures
     this.newFeatures.reverse();
   }
 
@@ -79,7 +82,8 @@ class SteerableParcoords {
 
   getDimensionPositions()
   {
-
+    var pos = this.featureOrder.reverse()
+    return pos
   }
 
   getFilter(dimension)
@@ -99,7 +103,8 @@ class SteerableParcoords {
 
   select(records)
   {
-
+    d3.selectAll("." + records)
+        .style("fill", "red")
   }
 
   saveAsSVG()
@@ -130,6 +135,7 @@ class SteerableParcoords {
         parcoords.dragging[(d.subject).name] = Math.min(parcoords.width, Math.max(0, this.__origin__ += d.dx));
         parcoords.active.attr('d', parcoords.linePath.bind(parcoords));
         parcoords.newFeatures.sort((a, b) => { return parcoords.position(b, parcoords) - parcoords.position(a, parcoords); });
+        parcoords.featureOrder = parcoords.newFeatures
         parcoords.xScales.domain(parcoords.newFeatures);
         parcoords.featureAxisG.attr("transform", (d) => { return "translate(" + parcoords.position(d.name, parcoords) + ")"; });
       };
@@ -352,6 +358,7 @@ class SteerableParcoords {
 
     this.featureAxisG
         .append("text")
+        .attr("class",d => d.name)
         .attr("text-anchor", "middle")
         .attr('y', this.padding / 2)
         .text(d => d.name);
