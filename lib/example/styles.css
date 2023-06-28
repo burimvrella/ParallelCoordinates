@@ -16,7 +16,7 @@
 
 text {
   text-shadow: 0 1px 0 #fff;
-  cursor: move;
+  cursor: ew-resize;
 }
 
 .student{
@@ -63,6 +63,8 @@ text {
   vertical-align: middle;
   white-space: nowrap;
   word-wrap: break-word;
+  margin-bottom: 4px;
+  margin-left: 4px;
 }
 
 .button:hover, input::file-selector-button:hover {
@@ -84,18 +86,11 @@ text {
   transition: none 0s;
 }
 
-.button:focus, input::file-selector-button:focus {
-  outline: 1px transparent;
-}
 
-.button:before, input::file-selector-button:before {
-  display: none;
-}
 
-.button:-webkit-details-marker, input::file-selector-button:-webkit-details-marker {
-  display: none;
-}
+
 
 .selectfeatures{
   font-size: larger;
 }
+
