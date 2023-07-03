@@ -41,9 +41,9 @@ class SteerableParcoords {
     return this.data;
   }
 
-  setFeatures(newFeatures): void
+  setDimensions(newDimension): void
   {
-    this.newFeatures = newFeatures;
+    this.newFeatures = newDimension;
     this.newFeatures.reverse();
   }
 
@@ -184,7 +184,7 @@ class SteerableParcoords {
 
   setupScales()
 {
-    //TODO check if intager and if then get all values for max and min 
+    //TODO check if integer and if then get all values for max and min
     this.features.map(x => {
 
       if (x.name === "Name") {
@@ -408,8 +408,6 @@ class SteerableParcoords {
         .style("opacity", ".4")
         .style('stroke', '#0081af')
   }
-
-
 
 }
 
