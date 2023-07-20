@@ -1,5 +1,17 @@
 # SteerableParallelCoordinates
 
+## How to build the SPC library
+
+### Install dependencies
+- Open terminal and execute the following command:
+  - npm install
+
+### Compile SPC library
+- Navigate to ParallelCoordinates folder
+- Open terminal and execute the following command:
+  -  tsc -p tsconfig.json
+- Then you should see the parallelcoordinates.js file in the lib folder
+
 ## Project Git Workflow
 
 ### Example
